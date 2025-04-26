@@ -16,21 +16,19 @@ pub struct Ppm {
 
 impl Ppm {
     pub fn export_ppm(&self, path: &Path) -> Result<()> {
-        let file = File::open(path)?;
+        let file = File::create(path)?;
         let mut buff = BufWriter::new(file);
-        buff.write(b"P3\n")?;
+        write!(buff, "P3\n")?;
+        write!(buff, "{} {}\n", self.r, self.c)?;
 
         for i in 0..self.r {
             for j in 0..self.c {
                 let pixel = self.data[i as usize][j as usize];
-                buff.write(
-                    (pixel.0.to_string() + " " + &pixel.1.to_string() + " " + &pixel.2.to_string())
-                        .as_bytes(),
-                )?;
+                write!(buff, "{} {} {}", pixel.0, pixel.1, pixel.2)?;
                 if j != self.c - 1 {
-                    buff.write(b" ")?;
+                    write!(buff, " ")?;
                 }
-                buff.write(b"\n")?;
+                write!(buff, "\n")?;
             }
         }
         Ok(())
