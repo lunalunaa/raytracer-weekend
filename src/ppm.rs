@@ -6,7 +6,7 @@ use std::{
 
 use anyhow::Result;
 
-use crate::common::RGB;
+use crate::color::RGB;
 
 pub struct PPM {
     pub h: usize,
@@ -30,7 +30,7 @@ impl PPM {
         for i in 0..self.h {
             for j in 0..self.w {
                 let pixel = self.data[i][j];
-                write!(buff, "{} {} {}\n", pixel.0, pixel.1, pixel.2)?;
+                write!(buff, "{} {} {}\n", pixel.r, pixel.g, pixel.b)?;
             }
         }
         Ok(())

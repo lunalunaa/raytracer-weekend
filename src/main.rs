@@ -1,8 +1,9 @@
-use common::RGB;
+use color::RGB;
 use ppm::PPM;
 
-mod common;
+mod color;
 mod ppm;
+mod vector;
 
 fn main() {
     let w = 256;
@@ -19,7 +20,7 @@ fn main() {
             let ig = (255.999 * g) as u8;
             let ib = (255.999 * b) as u8;
 
-            ppm.data[i][j] = RGB(ir, ig, ib);
+            ppm.data[i][j] = RGB::new(ir, ig, ib);
         }
     }
 
