@@ -8,27 +8,29 @@ use anyhow::Result;
 
 use crate::common::RGB;
 
-pub struct Ppm {
-    r: u32,
-    c: u32,
-    data: Vec<Vec<RGB>>,
+pub struct PPM {
+    pub h: usize,
+    pub w: usize,
+    pub data: Vec<Vec<RGB>>,
 }
 
-impl Ppm {
-    pub fn export_ppm(&self, path: &Path) -> Result<()> {
+impl PPM {
+    pub fn new(h: usize, w: usize) -> Self {
+        let data = vec![vec![RGB::default(); w]; h];
+        Self { h, w, data }
+    }
+
+    pub fn export_ppm<P: AsRef<Path>>(&self, path: P) -> Result<()> {
         let file = File::create(path)?;
         let mut buff = BufWriter::new(file);
         write!(buff, "P3\n")?;
-        write!(buff, "{} {}\n", self.r, self.c)?;
+        write!(buff, "{} {}\n", self.w, self.h)?;
+        write!(buff, "255\n")?;
 
-        for i in 0..self.r {
-            for j in 0..self.c {
-                let pixel = self.data[i as usize][j as usize];
-                write!(buff, "{} {} {}", pixel.0, pixel.1, pixel.2)?;
-                if j != self.c - 1 {
-                    write!(buff, " ")?;
-                }
-                write!(buff, "\n")?;
+        for i in 0..self.h {
+            for j in 0..self.w {
+                let pixel = self.data[i][j];
+                write!(buff, "{} {} {}\n", pixel.0, pixel.1, pixel.2)?;
             }
         }
         Ok(())
