@@ -11,8 +11,8 @@ fn main() {
     let mut ppm = PPM::new(h, w);
     for i in 0..h {
         for j in 0..w {
-            let r = i as f32 / (w as f32 - 1.0);
-            let g = j as f32 / (h as f32 - 1.0);
+            let r = i as f64 / (w as f64 - 1.0);
+            let g = j as f64 / (h as f64 - 1.0);
             let b = 0.0;
 
             let ir = (255.999 * r) as u8;
