@@ -1,4 +1,4 @@
-use color::RGB;
+use color::Color;
 use ppm::PPM;
 
 mod color;
@@ -12,15 +12,9 @@ fn main() {
     let mut ppm = PPM::new(h, w);
     for i in 0..h {
         for j in 0..w {
-            let r = i as f64 / (w as f64 - 1.0);
-            let g = j as f64 / (h as f64 - 1.0);
-            let b = 0.0;
+            let color = Color::new(i as f64 / (w - 1) as f64, j as f64 / (h - 1) as f64, 0.);
 
-            let ir = (255.999 * r) as u8;
-            let ig = (255.999 * g) as u8;
-            let ib = (255.999 * b) as u8;
-
-            ppm.data[i][j] = RGB::new(ir, ig, ib);
+            ppm.data[i][j] = color.to_rgb();
         }
     }
 

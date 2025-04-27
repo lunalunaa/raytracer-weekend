@@ -1,5 +1,6 @@
 use std::ops;
 
+#[derive(Clone)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -33,6 +34,11 @@ impl Vec3 {
             self.z * rhs.x - self.x * rhs.z,
             self.x * rhs.y - self.y * rhs.x,
         )
+    }
+
+    #[inline]
+    pub fn unit(&self, rhs: &Vec3) -> Vec3 {
+        self.clone() / self.len()
     }
 
     pub fn to_string(&self) -> String {
