@@ -9,10 +9,36 @@ mod ray;
 mod vector;
 
 fn ray_color(r: &Ray) -> Color {
+    let centre = Point3::new(0., 0., -1.);
+
+    let t = hit_sphere(&centre, 0.5, r);
+
+    if t >= 0. {
+        // the normal vector from the centre of the sphere
+        let normal = (r.at(t) - centre).unit();
+        return 0.5 * Color::new(normal.x + 1.0, normal.y + 1.0, normal.z + 1.);
+    }
+
+    // otherwise a gradient
     let unit_dir = r.dir.unit();
     let a = 0.5 * (unit_dir.y + 1.0);
 
     (1.0 - a) * Color::one() + a * Color::new(0.5, 0.7, 1.0)
+}
+
+// returns the smallest positive t value
+fn hit_sphere(centre: &Point3, radius: f64, r: &Ray) -> f64 {
+    let oc = *centre - r.origin;
+    let a = r.dir.dot(&r.dir);
+    let b = -2.0 * r.dir.dot(&oc);
+    let c = oc.dot(&oc) - radius * radius;
+    let discrim = b * b - 4.0 * a * c;
+
+    if discrim < 0. {
+        -1.
+    } else {
+        (-b - discrim.sqrt()) / (2.0 * a)
+    }
 }
 
 fn main() {
