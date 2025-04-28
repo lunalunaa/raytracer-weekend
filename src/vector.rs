@@ -1,18 +1,32 @@
 use std::ops;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
+pub type Point3 = Vec3;
+
 #[allow(unused)]
 impl Vec3 {
+    #[inline]
+    pub const fn zero() -> Self {
+        Self::new(0., 0., 0.)
+    }
+
+    #[inline]
+    pub const fn one() -> Self {
+        Self::new(1., 1., 1.)
+    }
+
+    #[inline]
     pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { x, y, z }
     }
 
+    #[inline]
     pub const fn len_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
@@ -23,12 +37,12 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn dot(&self, rhs: &Vec3) -> f64 {
+    pub const fn dot(&self, rhs: &Vec3) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
     #[inline]
-    pub fn cross(&self, rhs: &Vec3) -> Vec3 {
+    pub const fn cross(&self, rhs: &Vec3) -> Vec3 {
         Vec3::new(
             self.y * rhs.z - self.z * rhs.y,
             self.z * rhs.x - self.x * rhs.z,
@@ -37,8 +51,8 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn unit(&self, rhs: &Vec3) -> Vec3 {
-        self.clone() / self.len()
+    pub fn unit(&self) -> Vec3 {
+        *self / self.len()
     }
 
     pub fn to_string(&self) -> String {
@@ -116,16 +130,16 @@ impl ops::Mul<Vec3> for f64 {
     }
 }
 
-impl ops::Div<Vec3> for f64 {
+impl ops::Neg for Vec3 {
     type Output = Vec3;
 
-    fn div(self, rhs: Vec3) -> Self::Output {
-        rhs / self
+    fn neg(self) -> Self::Output {
+        Vec3::new(-self.x, -self.y, -self.z)
     }
 }
 
 impl Default for Vec3 {
     fn default() -> Self {
-        Self::new(0.0, 0.0, 0.0)
+        Self::new(0., 0., 0.)
     }
 }
