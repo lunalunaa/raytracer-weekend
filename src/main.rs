@@ -29,15 +29,15 @@ fn ray_color(r: &Ray) -> Color {
 // returns the smallest positive t value
 fn hit_sphere(centre: &Point3, radius: f64, r: &Ray) -> f64 {
     let oc = *centre - r.origin;
-    let a = r.dir.dot(&r.dir);
-    let b = -2.0 * r.dir.dot(&oc);
-    let c = oc.dot(&oc) - radius * radius;
-    let discrim = b * b - 4.0 * a * c;
+    let a = r.dir.len_squared();
+    let h = r.dir.dot(&oc);
+    let c = oc.len_squared() - radius * radius;
+    let discrim = h * h - a * c;
 
     if discrim < 0. {
         -1.
     } else {
-        (-b - discrim.sqrt()) / (2.0 * a)
+        (h - discrim.sqrt()) / a
     }
 }
 
