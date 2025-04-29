@@ -6,6 +6,7 @@ use vector::{Point3, Vec3};
 mod color;
 mod ppm;
 mod ray;
+mod shapes;
 mod vector;
 
 fn ray_color(r: &Ray) -> Color {
