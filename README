@@ -1,1 +1,3 @@
 Raytracer in a weekend (not quite)
+
+Run `cargo run` to see the generated ppm image
