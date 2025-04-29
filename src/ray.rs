@@ -1,4 +1,7 @@
-use std::rc::Rc;
+use std::{
+    f64::{INFINITY, NEG_INFINITY},
+    rc::Rc,
+};
 
 use crate::vector::{Point3, Vec3};
 
@@ -74,7 +77,7 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, int: &Interval) -> Option<HitRecord>;
 }
 
 pub struct HittableList {
@@ -94,12 +97,12 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord> {
-        let mut closest_so_far = ray_tmax;
+    fn hit(&self, r: &Ray, intvl: &Interval) -> Option<HitRecord> {
+        let mut closest_so_far = intvl.max;
         let mut rec = None;
 
         for object in &self.objects {
-            let temp_rec = object.hit(r, ray_tmin, closest_so_far);
+            let temp_rec = object.hit(r, &Interval::new(intvl.min, closest_so_far));
 
             if let Some(temp_rec1) = temp_rec {
                 closest_so_far = temp_rec1.t;
@@ -110,3 +113,36 @@ impl Hittable for HittableList {
         rec
     }
 }
+
+pub struct Interval {
+    pub min: f64,
+    pub max: f64,
+}
+
+#[allow(unused)]
+impl Interval {
+    #[inline]
+    pub const fn new(min: f64, max: f64) -> Self {
+        Self { min, max }
+    }
+
+    #[inline]
+    pub const fn size(&self) -> f64 {
+        self.max - self.min
+    }
+
+    #[inline]
+    pub const fn contains(&self, x: f64) -> bool {
+        self.min <= x && x <= self.max
+    }
+
+    #[inline]
+    pub const fn surrounds(&self, x: f64) -> bool {
+        self.min < x && x < self.max
+    }
+}
+
+#[allow(unused)]
+pub const EMPTY: Interval = Interval::new(INFINITY, NEG_INFINITY);
+#[allow(unused)]
+pub const UNIVERSE: Interval = Interval::new(NEG_INFINITY, INFINITY);
