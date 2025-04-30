@@ -11,7 +11,7 @@ pub struct Sphere {
 impl Sphere {
     pub fn new(centre: Point3, radius: f64) -> Self {
         Sphere {
-            centre: centre,
+            centre,
             radius: radius.max(0.),
         }
     }
