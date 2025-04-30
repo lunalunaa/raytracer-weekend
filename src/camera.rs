@@ -1,5 +1,3 @@
-use std::f64::INFINITY;
-
 use crate::{
     color::Color,
     ppm::PPM,
@@ -71,7 +69,7 @@ impl Camera {
     }
 
     fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
-        if let Some(hit_record) = world.hit(r, &Interval::new(0., INFINITY)) {
+        if let Some(hit_record) = world.hit(r, &Interval::new(0., f64::INFINITY)) {
             return 0.5 * (*hit_record.face_normal.normal() + Color::one());
         }
 

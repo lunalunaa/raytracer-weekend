@@ -1,7 +1,4 @@
-use std::{
-    f64::{INFINITY, NEG_INFINITY},
-    rc::Rc,
-};
+use std::rc::Rc;
 
 use crate::vector::{Point3, Vec3};
 
@@ -143,6 +140,6 @@ impl Interval {
 }
 
 #[allow(unused)]
-pub const EMPTY: Interval = Interval::new(INFINITY, NEG_INFINITY);
+pub const EMPTY: Interval = Interval::new(f64::INFINITY, f64::NEG_INFINITY);
 #[allow(unused)]
-pub const UNIVERSE: Interval = Interval::new(NEG_INFINITY, INFINITY);
+pub const UNIVERSE: Interval = Interval::new(f64::NEG_INFINITY, f64::INFINITY);

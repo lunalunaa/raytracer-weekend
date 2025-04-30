@@ -23,14 +23,14 @@ impl PPM {
     pub fn export_ppm<P: AsRef<Path>>(&self, path: P) -> Result<()> {
         let file = File::create(path)?;
         let mut buff = BufWriter::new(file);
-        write!(buff, "P3\n")?;
-        write!(buff, "{} {}\n", self.w, self.h)?;
-        write!(buff, "255\n")?;
+        writeln!(buff, "P3")?;
+        writeln!(buff, "{} {}", self.w, self.h)?;
+        writeln!(buff, "255")?;
 
         for i in 0..self.h {
             for j in 0..self.w {
                 let pixel = self.data[i][j];
-                write!(buff, "{} {} {}\n", pixel.r, pixel.g, pixel.b)?;
+                writeln!(buff, "{} {} {}", pixel.r, pixel.g, pixel.b)?;
             }
         }
         Ok(())

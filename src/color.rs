@@ -1,6 +1,7 @@
 use crate::vector::Vec3;
 
 #[derive(Clone, Copy)]
+#[derive(Default)]
 pub struct RGB {
     pub r: u8,
     pub g: u8,
@@ -14,11 +15,6 @@ impl RGB {
     }
 }
 
-impl Default for RGB {
-    fn default() -> Self {
-        Self { r: 0, g: 0, b: 0 }
-    }
-}
 
 pub type Color = Vec3;
 
