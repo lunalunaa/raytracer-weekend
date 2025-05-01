@@ -92,6 +92,7 @@ impl Camera {
     }
 
     // return a pair within [-0.5, 0.5], [-0.5, 0.5] range
+    #[inline]
     fn sample_square() -> (f64, f64) {
         (
             rand::random_range(-0.5..=0.5),
