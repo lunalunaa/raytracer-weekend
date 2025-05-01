@@ -137,6 +137,11 @@ impl Interval {
     pub const fn surrounds(&self, x: f64) -> bool {
         self.min < x && x < self.max
     }
+
+    #[inline]
+    pub const fn clamp(&self, x: f64) -> f64 {
+        x.clamp(self.min, self.max)
+    }
 }
 
 #[allow(unused)]

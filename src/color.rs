@@ -1,7 +1,6 @@
-use crate::vector::Vec3;
+use crate::{ray::Interval, vector::Vec3};
 
-#[derive(Clone, Copy)]
-#[derive(Default)]
+#[derive(Clone, Copy, Default)]
 pub struct RGB {
     pub r: u8,
     pub g: u8,
@@ -15,14 +14,14 @@ impl RGB {
     }
 }
 
-
 pub type Color = Vec3;
 
 impl Color {
     pub fn to_rgb(&self) -> RGB {
-        let r = (255.999 * self.x) as u8;
-        let g = (255.999 * self.y) as u8;
-        let b = (255.999 * self.z) as u8;
+        let intensity = Interval::new(0.000, 0.999);
+        let r = (256.0 * intensity.clamp(self.x)) as u8;
+        let g = (256.0 * intensity.clamp(self.y)) as u8;
+        let b = (256.0 * intensity.clamp(self.z)) as u8;
 
         RGB::new(r, g, b)
     }

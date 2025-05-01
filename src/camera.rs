@@ -10,6 +10,8 @@ pub struct Camera {
     pub aspect_ratio: f64,
     pub image_width: usize,
     image_height: usize,
+    pub samples_per_pixel: usize,
+    pixel_samples_scale: f64,
     centre: Point3,
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
@@ -17,9 +19,11 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_width: usize) -> Self {
+    pub fn new(aspect_ratio: f64, image_width: usize, samples_per_pixel: usize) -> Self {
         let mut image_height = (image_width as f64 / aspect_ratio) as usize;
         image_height = if image_height < 1 { 1 } else { image_height };
+
+        let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
 
         let focal_length = 1.0;
         let viewport_height = 2.0;
@@ -44,6 +48,8 @@ impl Camera {
             aspect_ratio,
             image_width,
             image_height,
+            samples_per_pixel,
+            pixel_samples_scale,
             centre,
             pixel00_loc,
             pixel_delta_u,
@@ -53,19 +59,39 @@ impl Camera {
 
     pub fn render(&self, world: &impl Hittable) {
         let mut ppm = PPM::new(self.image_height, self.image_width);
+        let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let pixel_centre = self.pixel00_loc
-                    + (i as f64 * self.pixel_delta_u)
-                    + (j as f64 * self.pixel_delta_v);
-                let ray_dir = pixel_centre - self.centre;
-                let ray = Ray::new(self.centre, ray_dir);
-                let color = Self::ray_color(&ray, world);
-                ppm.data[j][i] = color.to_rgb();
+                bar.inc(1);
+                let mut color = Color::zero();
+                for _ in 0..self.samples_per_pixel {
+                    let r = self.get_ray(i, j);
+                    color += Self::ray_color(&r, world);
+                }
+                ppm.data[j][i] = (color * self.pixel_samples_scale).to_rgb();
             }
         }
 
         ppm.export_ppm("image.ppm").unwrap();
+    }
+
+    // return a pair within [-0.5, 0.5], [-0.5, 0.5] range
+    fn sample_square() -> (f64, f64) {
+        (
+            rand::random_range(-0.5..=0.5),
+            rand::random_range(-0.5..=0.5),
+        )
+    }
+
+    // return the ray from the cam centre to the pixel coord (i, j)
+    fn get_ray(&self, i: usize, j: usize) -> Ray {
+        let offset = Self::sample_square();
+        let pixel_sample = self.pixel00_loc
+            + ((i as f64 + offset.0) * self.pixel_delta_u)
+            + ((j as f64 + offset.1) * self.pixel_delta_v);
+        let ray_dir = pixel_sample - self.centre;
+
+        Ray::new(self.centre, ray_dir)
     }
 
     fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
