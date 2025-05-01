@@ -92,18 +92,6 @@ impl Camera {
 
         canvas.data = data;
 
-        // for j in 0..self.image_height {
-        //     for i in 0..self.image_width {
-        //         bar.inc(1);
-        //         let mut color = Color::zero();
-        //         for _ in 0..self.samples_per_pixel {
-        //             let r = self.get_ray(i, j);
-        //             color += Self::ray_color(&r, world, self.max_bounce_depth);
-        //         }
-        //         canvas.data[j as usize][i as usize] = (color * self.pixel_samples_scale).as_rgb();
-        //     }
-        // }
-
         canvas.export_png("image.png").unwrap();
     }
 
