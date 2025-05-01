@@ -1,6 +1,6 @@
 use crate::{
+    canvas::Canvas,
     color::Color,
-    ppm::Ppm,
     ray::{Hittable, Interval, Ray},
     vector::{Point3, Vec3},
 };
@@ -10,8 +10,8 @@ use rayon::prelude::*;
 #[allow(unused)]
 pub struct Camera {
     pub aspect_ratio: f64,
-    pub image_width: usize,
-    image_height: usize,
+    pub image_width: u32,
+    image_height: u32,
     pub samples_per_pixel: usize,
     pixel_samples_scale: f64,
     centre: Point3,
@@ -24,11 +24,11 @@ pub struct Camera {
 impl Camera {
     pub fn new(
         aspect_ratio: f64,
-        image_width: usize,
+        image_width: u32,
         samples_per_pixel: usize,
         max_bounce_depth: usize,
     ) -> Self {
-        let mut image_height = (image_width as f64 / aspect_ratio) as usize;
+        let mut image_height = (image_width as f64 / aspect_ratio) as u32;
         image_height = if image_height < 1 { 1 } else { image_height };
 
         let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
@@ -67,7 +67,7 @@ impl Camera {
     }
 
     pub fn render(&self, world: &(impl Hittable + Sync)) {
-        let mut ppm = Ppm::new(self.image_height, self.image_width);
+        let mut canvas = Canvas::new(self.image_height, self.image_width);
         let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
         let data = (0..self.image_height)
             .into_par_iter()
@@ -90,7 +90,7 @@ impl Camera {
             })
             .collect::<Vec<_>>();
 
-        ppm.data = data;
+        canvas.data = data;
 
         for j in 0..self.image_height {
             for i in 0..self.image_width {
@@ -100,11 +100,11 @@ impl Camera {
                     let r = self.get_ray(i, j);
                     color += Self::ray_color(&r, world, self.max_bounce_depth);
                 }
-                ppm.data[j][i] = (color * self.pixel_samples_scale).as_rgb();
+                canvas.data[j as usize][i as usize] = (color * self.pixel_samples_scale).as_rgb();
             }
         }
 
-        ppm.export_ppm("image.ppm").unwrap();
+        canvas.export_png("image.png").unwrap();
     }
 
     // return a pair within [-0.5, 0.5], [-0.5, 0.5] range
@@ -116,7 +116,7 @@ impl Camera {
     }
 
     // return the ray from the cam centre to the pixel coord (i, j)
-    fn get_ray(&self, i: usize, j: usize) -> Ray {
+    fn get_ray(&self, i: u32, j: u32) -> Ray {
         let offset = Self::sample_square();
         let pixel_sample = self.pixel00_loc
             + ((i as f64 + offset.0) * self.pixel_delta_u)

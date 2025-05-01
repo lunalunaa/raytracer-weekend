@@ -6,8 +6,8 @@ use shapes::sphere::Sphere;
 use vector::Point3;
 
 mod camera;
+mod canvas;
 mod color;
-mod ppm;
 mod ray;
 mod shapes;
 mod vector;

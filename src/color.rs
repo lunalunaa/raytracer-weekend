@@ -12,6 +12,10 @@ impl Rgb {
     pub fn new(r: u8, g: u8, b: u8) -> Self {
         Rgb { r, g, b }
     }
+
+    pub fn as_array(&self) -> [u8; 3] {
+        [self.r, self.g, self.b]
+    }
 }
 
 pub type Color = Vec3;
