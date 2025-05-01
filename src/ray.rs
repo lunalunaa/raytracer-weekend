@@ -1,7 +1,4 @@
-use std::{
-    rc::Rc,
-    sync::{Arc, RwLock},
-};
+use std::sync::Arc;
 
 use crate::vector::{Point3, Vec3};
 
