@@ -6,13 +6,14 @@ use shapes::sphere::Sphere;
 use vector::Point3;
 
 mod camera;
-mod canvas;
 mod color;
 mod ray;
 mod shapes;
 mod vector;
 
-fn main() {
+use anyhow::Result;
+
+fn main() -> Result<()> {
     // image
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
@@ -33,5 +34,7 @@ fn main() {
     world.add(sphere_1);
     world.add(sphere_2);
 
-    cam.render(&world);
+    cam.render(&world)?;
+
+    Ok(())
 }

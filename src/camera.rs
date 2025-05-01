@@ -1,11 +1,13 @@
+use std::{fs::File, io::BufWriter};
+
 use crate::{
-    canvas::Canvas,
     color::Color,
     ray::{Hittable, Interval, Ray},
     vector::{Point3, Vec3},
 };
 
-use rayon::prelude::*;
+use anyhow::Result;
+use image::Rgb;
 
 #[allow(unused)]
 pub struct Camera {
@@ -66,33 +68,27 @@ impl Camera {
         }
     }
 
-    pub fn render(&self, world: &(impl Hittable + Sync)) {
-        let mut canvas = Canvas::new(self.image_height, self.image_width);
+    #[inline]
+    fn render_pixel(&self, x: u32, y: u32, world: &(impl Hittable + Sync)) -> Rgb<u8> {
+        let mut color = Color::zero();
+        for _ in 0..self.samples_per_pixel {
+            let r = self.get_ray(x, y);
+            color += Self::ray_color(&r, world, self.max_bounce_depth);
+        }
+
+        image::Rgb((color * self.pixel_samples_scale).as_rgb().as_array())
+    }
+
+    pub fn render(&self, world: &(impl Hittable + Sync)) -> Result<()> {
         let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
-        let data = (0..self.image_height)
-            .into_par_iter()
-            .map(|j| {
-                (0..self.image_width)
-                    .into_par_iter()
-                    .map({
-                        bar.clone().inc(1);
-                        move |i| {
-                            let mut color = Color::zero();
-                            for _ in 0..self.samples_per_pixel {
-                                let r = self.get_ray(i, j);
-                                color += Self::ray_color(&r, world, self.max_bounce_depth);
-                            }
+        let img = image::ImageBuffer::from_par_fn(self.image_width, self.image_height, |x, y| {
+            bar.inc(1);
+            self.render_pixel(x, y, world)
+        });
 
-                            color.as_rgb()
-                        }
-                    })
-                    .collect::<Vec<_>>()
-            })
-            .collect::<Vec<_>>();
-
-        canvas.data = data;
-
-        canvas.export_png("image.png").unwrap();
+        let mut buf = BufWriter::new(File::create("image.png")?);
+        img.write_to(&mut buf, image::ImageFormat::Png)?;
+        Ok(())
     }
 
     // return a pair within [-0.5, 0.5], [-0.5, 0.5] range
