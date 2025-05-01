@@ -55,10 +55,6 @@ impl Vec3 {
         *self / self.len()
     }
 
-    pub fn to_string(&self) -> String {
-        format!("Vec3({}, {}, {})", self.x, self.y, self.z)
-    }
-
     #[inline]
     pub fn random() -> Vec3 {
         Vec3::new(rand::random(), rand::random(), rand::random())
@@ -87,7 +83,7 @@ impl Vec3 {
     #[inline]
     pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
         let on_unit_sphere = Self::random_unit_vec();
-        if on_unit_sphere.dot(&normal) > 0.0 {
+        if on_unit_sphere.dot(normal) > 0.0 {
             on_unit_sphere
         } else {
             -on_unit_sphere

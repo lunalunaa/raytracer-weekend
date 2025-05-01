@@ -6,17 +6,17 @@ use std::{
 
 use anyhow::Result;
 
-use crate::color::RGB;
+use crate::color::Rgb;
 
-pub struct PPM {
+pub struct Ppm {
     pub h: usize,
     pub w: usize,
-    pub data: Vec<Vec<RGB>>,
+    pub data: Vec<Vec<Rgb>>,
 }
 
-impl PPM {
+impl Ppm {
     pub fn new(h: usize, w: usize) -> Self {
-        let data = vec![vec![RGB::default(); w]; h];
+        let data = vec![vec![Rgb::default(); w]; h];
         Self { h, w, data }
     }
 

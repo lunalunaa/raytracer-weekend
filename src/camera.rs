@@ -1,6 +1,6 @@
 use crate::{
     color::Color,
-    ppm::PPM,
+    ppm::Ppm,
     ray::{Hittable, Interval, Ray},
     vector::{Point3, Vec3},
 };
@@ -67,7 +67,7 @@ impl Camera {
     }
 
     pub fn render(&self, world: &(impl Hittable + Sync)) {
-        let mut ppm = PPM::new(self.image_height, self.image_width);
+        let mut ppm = Ppm::new(self.image_height, self.image_width);
         let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
         let data = (0..self.image_height)
             .into_par_iter()
@@ -83,7 +83,7 @@ impl Camera {
                                 color += Self::ray_color(&r, world, self.max_bounce_depth);
                             }
 
-                            color.to_rgb()
+                            color.as_rgb()
                         }
                     })
                     .collect::<Vec<_>>()
@@ -100,7 +100,7 @@ impl Camera {
                     let r = self.get_ray(i, j);
                     color += Self::ray_color(&r, world, self.max_bounce_depth);
                 }
-                ppm.data[j][i] = (color * self.pixel_samples_scale).to_rgb();
+                ppm.data[j][i] = (color * self.pixel_samples_scale).as_rgb();
             }
         }
 
@@ -127,7 +127,7 @@ impl Camera {
     }
 
     fn ray_color(r: &Ray, world: &impl Hittable, bounce_depth: usize) -> Color {
-        if bounce_depth <= 0 {
+        if bounce_depth == 0 {
             return Color::zero();
         }
 
