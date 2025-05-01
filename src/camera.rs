@@ -5,6 +5,8 @@ use crate::{
     vector::{Point3, Vec3},
 };
 
+use rayon::prelude::*;
+
 #[allow(unused)]
 pub struct Camera {
     pub aspect_ratio: f64,
@@ -64,9 +66,32 @@ impl Camera {
         }
     }
 
-    pub fn render(&self, world: &impl Hittable) {
+    pub fn render(&self, world: &(impl Hittable + Sync)) {
         let mut ppm = PPM::new(self.image_height, self.image_width);
         let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
+        let data = (0..self.image_height)
+            .into_par_iter()
+            .map(|j| {
+                (0..self.image_width)
+                    .into_par_iter()
+                    .map({
+                        bar.clone().inc(1);
+                        move |i| {
+                            let mut color = Color::zero();
+                            for _ in 0..self.samples_per_pixel {
+                                let r = self.get_ray(i, j);
+                                color += Self::ray_color(&r, world, self.max_bounce_depth);
+                            }
+
+                            color.to_rgb()
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+
+        ppm.data = data;
+
         for j in 0..self.image_height {
             for i in 0..self.image_width {
                 bar.inc(1);

@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 use camera::Camera;
 use ray::HittableList;
@@ -28,8 +28,8 @@ fn main() {
 
     // world
     let mut world = HittableList::new();
-    let sphere_1 = Rc::new(Sphere::new(Point3::new(0., 0., -1.), 0.5));
-    let sphere_2 = Rc::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.0));
+    let sphere_1 = Arc::new(Sphere::new(Point3::new(0., 0., -1.), 0.5));
+    let sphere_2 = Arc::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.0));
     world.add(sphere_1);
     world.add(sphere_2);
 
