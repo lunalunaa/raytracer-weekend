@@ -51,12 +51,47 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn unit(&self) -> Vec3 {
+    pub fn unit_vec(&self) -> Vec3 {
         *self / self.len()
     }
 
     pub fn to_string(&self) -> String {
         format!("Vec3({}, {}, {})", self.x, self.y, self.z)
+    }
+
+    #[inline]
+    pub fn random() -> Vec3 {
+        Vec3::new(rand::random(), rand::random(), rand::random())
+    }
+
+    #[inline]
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
+        Vec3::new(
+            rand::random_range(min..=max),
+            rand::random_range(min..=max),
+            rand::random_range(min..=max),
+        )
+    }
+
+    #[inline]
+    pub fn random_unit_vec() -> Vec3 {
+        loop {
+            let p = Self::random_range(-1.0, 1.0);
+            let lensq = p.len_squared();
+            if 1e-160 < lensq && lensq <= 1. {
+                return p / lensq.sqrt();
+            }
+        }
+    }
+
+    #[inline]
+    pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+        let on_unit_sphere = Self::random_unit_vec();
+        if on_unit_sphere.dot(&normal) > 0.0 {
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
+        }
     }
 }
 

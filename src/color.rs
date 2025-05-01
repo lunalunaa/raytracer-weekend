@@ -17,11 +17,19 @@ impl RGB {
 pub type Color = Vec3;
 
 impl Color {
+    pub fn linear_to_gamma(linear_component: f64) -> f64 {
+        if linear_component > 0. {
+            linear_component.sqrt()
+        } else {
+            0.
+        }
+    }
+
     pub fn to_rgb(&self) -> RGB {
         let intensity = Interval::new(0.000, 0.999);
-        let r = (256.0 * intensity.clamp(self.x)) as u8;
-        let g = (256.0 * intensity.clamp(self.y)) as u8;
-        let b = (256.0 * intensity.clamp(self.z)) as u8;
+        let r = (256.0 * intensity.clamp(Self::linear_to_gamma(self.x))) as u8;
+        let g = (256.0 * intensity.clamp(Self::linear_to_gamma(self.y))) as u8;
+        let b = (256.0 * intensity.clamp(Self::linear_to_gamma(self.z))) as u8;
 
         RGB::new(r, g, b)
     }

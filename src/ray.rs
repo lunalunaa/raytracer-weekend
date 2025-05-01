@@ -20,7 +20,7 @@ impl Ray {
     }
 }
 
-// normals always point outward from the surface,
+// normals always point against the ray
 // we keep track of which side of the surface the ray is coming from
 #[derive(Clone)]
 pub enum FaceNormal {
@@ -57,6 +57,7 @@ pub struct HitRecord {
     pub face_normal: FaceNormal,
 }
 
+#[allow(unused)]
 impl HitRecord {
     pub fn calc_face_normal(r: &Ray, outward_normal: &Vec3) -> FaceNormal {
         let front_face = r.dir.dot(outward_normal) < 0.;
@@ -66,6 +67,10 @@ impl HitRecord {
         } else {
             FaceNormal::Back(-*outward_normal)
         }
+    }
+
+    pub fn normal(&self) -> &Vec3 {
+        self.face_normal.normal()
     }
 
     pub fn new(t: f64, p: Point3, face_normal: FaceNormal) -> Self {

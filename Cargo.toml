@@ -7,3 +7,9 @@ edition = "2024"
 anyhow = "1.0.98"
 indicatif = "0.17.11"
 rand = "0.9.1"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1

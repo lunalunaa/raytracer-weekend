@@ -16,10 +16,16 @@ pub struct Camera {
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
+    max_bounce_depth: usize,
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_width: usize, samples_per_pixel: usize) -> Self {
+    pub fn new(
+        aspect_ratio: f64,
+        image_width: usize,
+        samples_per_pixel: usize,
+        max_bounce_depth: usize,
+    ) -> Self {
         let mut image_height = (image_width as f64 / aspect_ratio) as usize;
         image_height = if image_height < 1 { 1 } else { image_height };
 
@@ -54,6 +60,7 @@ impl Camera {
             pixel00_loc,
             pixel_delta_u,
             pixel_delta_v,
+            max_bounce_depth,
         }
     }
 
@@ -66,7 +73,7 @@ impl Camera {
                 let mut color = Color::zero();
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    color += Self::ray_color(&r, world);
+                    color += Self::ray_color(&r, world, self.max_bounce_depth);
                 }
                 ppm.data[j][i] = (color * self.pixel_samples_scale).to_rgb();
             }
@@ -94,13 +101,21 @@ impl Camera {
         Ray::new(self.centre, ray_dir)
     }
 
-    fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
-        if let Some(hit_record) = world.hit(r, &Interval::new(0., f64::INFINITY)) {
-            return 0.5 * (*hit_record.face_normal.normal() + Color::one());
+    fn ray_color(r: &Ray, world: &impl Hittable, bounce_depth: usize) -> Color {
+        if bounce_depth <= 0 {
+            return Color::zero();
         }
 
-        // otherwise a gradient
-        let unit_dir = r.dir.unit();
+        if let Some(hit_record) = world.hit(r, &Interval::new(0.001, f64::INFINITY)) {
+            // bounce the ray with a lambertian reflection
+            let dir = Vec3::random_unit_vec() + *hit_record.normal();
+
+            // 0.5 means it reflects half of the color, which means it's grey
+            return 0.5 * Self::ray_color(&Ray::new(hit_record.p, dir), world, bounce_depth - 1);
+        }
+
+        // otherwise a gradient background
+        let unit_dir = r.dir.unit_vec();
         let a = 0.5 * (unit_dir.y + 1.0);
 
         (1.0 - a) * Color::one() + a * Color::new(0.5, 0.7, 1.0)
