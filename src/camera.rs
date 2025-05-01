@@ -71,9 +71,11 @@ impl Camera {
         let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
         let data = (0..self.image_height)
             .into_par_iter()
+            .by_uniform_blocks(20)
             .map(|j| {
                 (0..self.image_width)
                     .into_par_iter()
+                    .by_uniform_blocks(20)
                     .map({
                         bar.clone().inc(1);
                         move |i| {
