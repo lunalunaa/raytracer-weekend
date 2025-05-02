@@ -56,7 +56,7 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn random() -> Vec3 {
+    pub fn random_cube() -> Vec3 {
         Vec3::new(rand::random(), rand::random(), rand::random())
     }
 
@@ -110,6 +110,20 @@ impl Vec3 {
         let r_out_parallel = -((1.0 - r_out_perp.len_squared()).abs().sqrt()) * *n;
 
         r_out_perp + r_out_parallel
+    }
+
+    #[inline]
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let p = Vec3::new(
+                rand::random_range(-1.0..1.0),
+                rand::random_range(-1.0..1.0),
+                0.,
+            );
+            if p.len_squared() < 1.0 {
+                return p;
+            }
+        }
     }
 }
 

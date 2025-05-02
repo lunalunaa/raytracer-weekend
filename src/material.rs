@@ -103,11 +103,12 @@ impl Material for Dielectric {
 
         let cannot_refract = ri * sin_theta > 1.0;
 
-        let dir = if cannot_refract || Self::reflectance(cos_theta, ri) > rand::random() {
-            r_in_unit_dir.reflect(rec.normal())
-        } else {
-            r_in_unit_dir.refract(rec.normal(), ri)
-        };
+        let dir =
+            if cannot_refract || Self::reflectance(cos_theta, ri) > rand::random_range(0.0..1.0) {
+                r_in_unit_dir.reflect(rec.normal())
+            } else {
+                r_in_unit_dir.refract(rec.normal(), ri)
+            };
 
         let r = Ray::new(rec.p, dir);
         Scatter::Scattered(r, atten)
