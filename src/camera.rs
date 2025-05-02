@@ -2,6 +2,7 @@ use std::{fs::File, io::BufWriter};
 
 use crate::{
     color::Color,
+    material::Scatter,
     ray::{Hittable, Interval, Ray},
     vector::{Point3, Vec3},
 };
@@ -116,12 +117,12 @@ impl Camera {
             return Color::zero();
         }
 
-        if let Some(hit_record) = world.hit(r, &Interval::new(0.001, f64::INFINITY)) {
-            // bounce the ray with a lambertian reflection
-            let dir = Vec3::random_unit_vec() + *hit_record.normal();
-
-            // 0.5 means it reflects half of the color, which means it's grey
-            return 0.5 * Self::ray_color(&Ray::new(hit_record.p, dir), world, bounce_depth - 1);
+        if let Some(rec) = world.hit(r, &Interval::new(0.001, f64::INFINITY)) {
+            if let Scatter::Scattered(r, atten) = rec.mat.scatter(r, &rec) {
+                return atten * Self::ray_color(&r, world, bounce_depth - 1);
+            } else {
+                return Color::zero();
+            }
         }
 
         // otherwise a gradient background

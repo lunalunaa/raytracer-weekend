@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use crate::vector::{Point3, Vec3};
+use crate::{
+    material::Material,
+    vector::{Point3, Vec3},
+};
 
 pub struct Ray {
     pub origin: Point3,
@@ -55,6 +58,7 @@ pub struct HitRecord {
     pub t: f64,
     pub p: Point3,
     pub face_normal: FaceNormal,
+    pub mat: Arc<dyn Material + Sync + Send>,
 }
 
 #[allow(unused)]
@@ -73,8 +77,18 @@ impl HitRecord {
         self.face_normal.normal()
     }
 
-    pub fn new(t: f64, p: Point3, face_normal: FaceNormal) -> Self {
-        Self { t, p, face_normal }
+    pub fn new(
+        t: f64,
+        p: Point3,
+        face_normal: FaceNormal,
+        mat: Arc<dyn Material + Sync + Send>,
+    ) -> Self {
+        Self {
+            t,
+            p,
+            face_normal,
+            mat,
+        }
     }
 }
 

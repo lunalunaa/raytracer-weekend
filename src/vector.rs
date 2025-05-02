@@ -89,6 +89,18 @@ impl Vec3 {
             -on_unit_sphere
         }
     }
+
+    #[inline]
+    pub const fn near_zero(&self) -> bool {
+        let s = 1e-8;
+
+        self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
+    }
+
+    #[inline]
+    pub fn reflect(&self, n: &Vec3) -> Vec3 {
+        *self - (2. * self.dot(n)) * *n
+    }
 }
 
 impl ops::Add for Vec3 {
@@ -158,6 +170,15 @@ impl ops::Mul<Vec3> for f64 {
 
     fn mul(self, rhs: Vec3) -> Self::Output {
         rhs * self
+    }
+}
+
+// Hadamard product
+impl ops::Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
 
