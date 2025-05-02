@@ -11,7 +11,7 @@ pub trait Material {
 #[allow(unused)]
 pub enum Scatter {
     Scattered(Ray, Color), // scattered ray and attenuation
-    Unscattered,
+    Absorbed,
 }
 
 pub struct Lambertian {
@@ -41,19 +41,27 @@ impl Material for Lambertian {
 
 pub struct Metal {
     pub albedo: Color,
+    pub fuzz: f64,
 }
 
 impl Metal {
     #[inline]
-    pub const fn new(albedo: Color) -> Self {
-        Self { albedo }
+    pub const fn new(albedo: Color, fuzz: f64) -> Self {
+        Self { albedo, fuzz }
     }
 }
 
 impl Material for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Scatter {
-        let reflected = r_in.dir.reflect(rec.normal());
+        // fuzz factor adds randomness to the scattering
+        let reflected =
+            r_in.dir.reflect(rec.normal()).unit_vec() + (self.fuzz * Vec3::random_unit_vec());
         let r = Ray::new(rec.p, reflected);
-        Scatter::Scattered(r, self.albedo)
+
+        if r.dir.dot(rec.normal()) > 0. {
+            Scatter::Scattered(r, self.albedo)
+        } else {
+            Scatter::Absorbed
+        }
     }
 }
