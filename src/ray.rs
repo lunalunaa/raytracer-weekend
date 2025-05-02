@@ -27,8 +27,8 @@ impl Ray {
 // we keep track of which side of the surface the ray is coming from
 #[derive(Clone)]
 pub enum FaceNormal {
-    Front(Vec3),
-    Back(Vec3),
+    Front(Vec3), // ray hits surface "from the inside"
+    Back(Vec3),  // ray hits surface "from the outside"
 }
 
 #[allow(unused)]

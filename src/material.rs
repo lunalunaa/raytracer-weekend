@@ -65,3 +65,51 @@ impl Material for Metal {
         }
     }
 }
+
+// refractive index in vacuum or air
+// or the ratio of the refractive index over the refractive index of the enclosing media
+pub struct Dielectric {
+    pub refract_idx: f64,
+}
+
+impl Dielectric {
+    pub fn new(refract_idx: f64) -> Self {
+        Self { refract_idx }
+    }
+
+    fn reflectance(cosine: f64, refract_idx: f64) -> f64 {
+        let mut r_0 = (1. - refract_idx) / (1. + refract_idx);
+        r_0 *= r_0;
+        r_0 + (1. - r_0) * (1. - cosine).powi(5)
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Scatter {
+        let atten = Color::one();
+
+        // if it hits the inner surface then we need to invert the index,
+        // otherwise we keep it the same
+        let ri = if rec.face_normal.is_front() {
+            1.0 / self.refract_idx
+        } else {
+            self.refract_idx
+        };
+
+        let r_in_unit_dir = r_in.dir.unit_vec();
+
+        let cos_theta = (-r_in_unit_dir).dot(rec.normal()).min(1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        let cannot_refract = ri * sin_theta > 1.0;
+
+        let dir = if cannot_refract || Self::reflectance(cos_theta, ri) > rand::random() {
+            r_in_unit_dir.reflect(rec.normal())
+        } else {
+            r_in_unit_dir.refract(rec.normal(), ri)
+        };
+
+        let r = Ray::new(rec.p, dir);
+        Scatter::Scattered(r, atten)
+    }
+}

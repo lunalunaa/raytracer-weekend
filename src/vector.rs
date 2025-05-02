@@ -101,6 +101,16 @@ impl Vec3 {
     pub fn reflect(&self, n: &Vec3) -> Vec3 {
         *self - (2. * self.dot(n)) * *n
     }
+
+    #[inline]
+    // assume self is unit length
+    pub fn refract(&self, n: &Vec3, eta_ratio: f64) -> Vec3 {
+        let cos_theta = (-*self).dot(n).min(1.0);
+        let r_out_perp = eta_ratio * (*self + cos_theta * *n);
+        let r_out_parallel = -((1.0 - r_out_perp.len_squared()).abs().sqrt()) * *n;
+
+        r_out_perp + r_out_parallel
+    }
 }
 
 impl ops::Add for Vec3 {

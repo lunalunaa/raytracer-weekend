@@ -1,4 +1,4 @@
-use std::{fs::File, io::BufWriter};
+use std::{f64, fs::File, io::BufWriter};
 
 use crate::{
     color::Color,
@@ -22,6 +22,7 @@ pub struct Camera {
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
     max_bounce_depth: usize,
+    pub vfov: f64,
 }
 
 impl Camera {
@@ -30,14 +31,18 @@ impl Camera {
         image_width: u32,
         samples_per_pixel: usize,
         max_bounce_depth: usize,
+        vfov: f64,
     ) -> Self {
         let mut image_height = (image_width as f64 / aspect_ratio) as u32;
         image_height = if image_height < 1 { 1 } else { image_height };
 
         let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
 
+        // determine viewport dimensions
         let focal_length = 1.0;
-        let viewport_height = 2.0;
+        let theta = degrees_to_radians(vfov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
         let centre = Point3::zero();
 
@@ -66,6 +71,7 @@ impl Camera {
             pixel_delta_u,
             pixel_delta_v,
             max_bounce_depth,
+            vfov,
         }
     }
 
@@ -131,4 +137,9 @@ impl Camera {
 
         (1.0 - a) * Color::one() + a * Color::new(0.5, 0.7, 1.0)
     }
+}
+
+#[inline]
+const fn degrees_to_radians(degrees: f64) -> f64 {
+    degrees * f64::consts::PI / 180.0
 }
