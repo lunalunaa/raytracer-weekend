@@ -60,6 +60,16 @@ impl Aabb {
         }
     }
 
+    #[inline]
+    pub const fn longest_axis(&self) -> u8 {
+        if self.x.size() > self.y.size() {
+            if self.x.size() > self.z.size() { 0 } else { 2 }
+        } else {
+            if self.y.size() > self.z.size() { 1 } else { 2 }
+        }
+    }
+
+    #[inline]
     pub fn hit(&self, r: &Ray, int: &Interval) -> bool {
         let Ray { dir, origin } = r;
 

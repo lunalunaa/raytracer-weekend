@@ -1,4 +1,4 @@
-use std::{f64, fs::File, io::BufWriter};
+use std::{f64, fs::File, io::BufWriter, time::Instant};
 
 use crate::{
     color::Color,
@@ -122,6 +122,7 @@ impl Camera {
     }
 
     pub fn render(&self, world: &(impl Hittable + Sync)) -> Result<()> {
+        let now = Instant::now();
         let bar = indicatif::ProgressBar::new(self.image_height as u64 * self.image_width as u64);
         let img = image::ImageBuffer::from_par_fn(self.image_width, self.image_height, |x, y| {
             bar.inc(1);
@@ -130,6 +131,8 @@ impl Camera {
 
         let mut buf = BufWriter::new(File::create("image.png")?);
         img.write_to(&mut buf, image::ImageFormat::Png)?;
+        let elapsed_time = now.elapsed();
+        println!("Rendering took {} seconds", elapsed_time.as_secs_f32());
         Ok(())
     }
 

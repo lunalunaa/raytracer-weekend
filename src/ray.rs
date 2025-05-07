@@ -151,7 +151,12 @@ impl BVHNode {
     }
 
     pub fn from_object_slice(objects: &mut [Arc<dyn Hittable + Sync + Send>]) -> Self {
-        let axis = random_range(0..3);
+        let mut bbox = Aabb::empty();
+        for obj in objects.iter() {
+            bbox = Aabb::enclose(&bbox, obj.bounding_box())
+        }
+
+        let axis = bbox.longest_axis();
 
         let comparator = match axis {
             0 => Self::box_x_compare,
