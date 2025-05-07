@@ -30,6 +30,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
+    #[inline(always)]
     fn hit(&self, r: &Ray, intvl: &Interval) -> Option<HitRecord> {
         let oc = self.centre - r.origin;
         let a = r.dir.len_squared();
@@ -60,6 +61,7 @@ impl Hittable for Sphere {
         Some(HitRecord::new(t, p, face_normal, self.mat.clone()))
     }
 
+    #[inline(always)]
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
     }

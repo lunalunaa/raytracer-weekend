@@ -27,6 +27,7 @@ pub enum FaceNormal {
 
 #[allow(unused)]
 impl FaceNormal {
+    #[inline(always)]
     pub fn is_front(&self) -> bool {
         match self {
             FaceNormal::Front(_) => true,
@@ -34,10 +35,12 @@ impl FaceNormal {
         }
     }
 
+    #[inline(always)]
     pub fn is_back(&self) -> bool {
         !self.is_front()
     }
 
+    #[inline(always)]
     pub fn normal(&self) -> &Vec3 {
         match self {
             FaceNormal::Front(normal) => normal,
@@ -54,38 +57,38 @@ pub struct Interval {
 
 #[allow(unused)]
 impl Interval {
-    #[inline]
+    #[inline(always)]
     pub const fn new(min: f32, max: f32) -> Self {
         Self { min, max }
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn size(&self) -> f32 {
         self.max - self.min
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn contains(&self, x: f32) -> bool {
         self.min <= x && x <= self.max
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn surrounds(&self, x: f32) -> bool {
         self.min < x && x < self.max
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn clamp(&self, x: f32) -> f32 {
         x.clamp(self.min, self.max)
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn expand(&self, delta: f32) -> Self {
         let padding = delta / 2.;
         Self::new(self.min - padding, self.max + padding)
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn enclose(a: &Interval, b: &Interval) -> Self {
         let min = if a.min <= b.min { a.min } else { b.min };
 

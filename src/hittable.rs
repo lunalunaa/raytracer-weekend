@@ -16,6 +16,7 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
+    #[inline(always)]
     pub fn calc_face_normal(r: &Ray, outward_normal: &Vec3) -> FaceNormal {
         let front_face = r.dir.dot(outward_normal) < 0.;
 
@@ -26,10 +27,12 @@ impl HitRecord {
         }
     }
 
+    #[inline(always)]
     pub fn normal(&self) -> &Vec3 {
         self.face_normal.normal()
     }
 
+    #[inline(always)]
     pub fn new(
         t: f32,
         p: Point3,
@@ -70,6 +73,7 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
+    #[inline(always)]
     fn hit(&self, r: &Ray, intvl: &Interval) -> Option<HitRecord> {
         let mut closest_so_far = intvl.max;
         let mut rec = None;

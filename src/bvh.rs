@@ -93,6 +93,7 @@ impl BVHNode {
 }
 
 impl Hittable for BVHNode {
+    #[inline(always)]
     fn hit(&self, r: &Ray, int: &Interval) -> Option<HitRecord> {
         if !self.bbox.hit(r, int) {
             return None;
@@ -110,6 +111,7 @@ impl Hittable for BVHNode {
         hit_right.or(hit_left)
     }
 
+    #[inline(always)]
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
     }

@@ -10,7 +10,7 @@ pub struct Aabb {
 }
 
 impl Aabb {
-    #[inline]
+    #[inline(always)]
     pub const fn empty() -> Self {
         Aabb {
             x: Interval::EMPTY,
@@ -19,7 +19,7 @@ impl Aabb {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn new(a: &Point3, b: &Point3) -> Self {
         let x = if a.x <= b.x {
             Interval::new(a.x, b.x)
@@ -42,7 +42,7 @@ impl Aabb {
         Self { x, y, z }
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn axis_interval(&self, n: u8) -> &Interval {
         match n {
             1 => &self.y,
@@ -51,7 +51,7 @@ impl Aabb {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn enclose(box0: &Aabb, box1: &Aabb) -> Aabb {
         Aabb {
             x: Interval::enclose(&box0.x, &box1.x),
@@ -60,7 +60,7 @@ impl Aabb {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub const fn longest_axis(&self) -> u8 {
         if self.x.size() > self.y.size() {
             if self.x.size() > self.z.size() { 0 } else { 2 }
@@ -69,7 +69,7 @@ impl Aabb {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn hit(&self, r: &Ray, int: &Interval) -> bool {
         let Ray { dir, origin } = r;
 

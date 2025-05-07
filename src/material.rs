@@ -14,13 +14,14 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    #[inline]
+    #[inline(always)]
     pub const fn new(albedo: Color) -> Self {
         Self { albedo }
     }
 }
 
 impl Material for Lambertian {
+    #[inline(always)]
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord) -> Scatter {
         let mut scatter_dir = *rec.normal() + Vec3::random_unit_vec();
 
@@ -40,13 +41,14 @@ pub struct Metal {
 }
 
 impl Metal {
-    #[inline]
+    #[inline(always)]
     pub const fn new(albedo: Color, fuzz: f32) -> Self {
         Self { albedo, fuzz }
     }
 }
 
 impl Material for Metal {
+    #[inline(always)]
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Scatter {
         // fuzz factor adds randomness to the scattering
         let reflected =
@@ -68,10 +70,12 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
+    #[inline(always)]
     pub fn new(refract_idx: f32) -> Self {
         Self { refract_idx }
     }
 
+    #[inline(always)]
     fn reflectance(cosine: f32, refract_idx: f32) -> f32 {
         let mut r_0 = (1. - refract_idx) / (1. + refract_idx);
         r_0 *= r_0;
@@ -80,6 +84,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
+    #[inline(always)]
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Scatter {
         let atten = Color::one();
 

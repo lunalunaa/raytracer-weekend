@@ -111,7 +111,7 @@ impl Camera {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     fn render_pixel(&self, x: u32, y: u32, world: &(impl Hittable + Sync)) -> Rgb<u8> {
         let mut color = Color::zero();
         for _ in 0..self.samples_per_pixel {
@@ -138,7 +138,7 @@ impl Camera {
     }
 
     // return a pair within [-0.5, 0.5], [-0.5, 0.5] range
-    #[inline]
+    #[inline(always)]
     fn sample_square() -> (f32, f32) {
         (
             fastrand_contrib::f32_range(-0.5..=0.5),
@@ -146,13 +146,14 @@ impl Camera {
         )
     }
 
-    #[inline]
+    #[inline(always)]
     fn defocus_disk_sample(&self) -> Point3 {
         let p = Vec3::random_in_unit_disk();
         self.centre + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
 
     // return the ray from the cam centre to the pixel coord (i, j)
+    #[inline(always)]
     fn get_ray(&self, i: u32, j: u32) -> Ray {
         // Construct a camera ray originating from the defocus disk and directed at a randomly
         // sampled point around the pixel location i, j.
@@ -173,6 +174,7 @@ impl Camera {
         Ray::new(ray_origin, ray_dir)
     }
 
+    #[inline(always)]
     fn ray_color(r: &Ray, world: &impl Hittable, bounce_depth: usize) -> Color {
         if bounce_depth == 0 {
             return Color::zero();
@@ -194,7 +196,7 @@ impl Camera {
     }
 }
 
-#[inline]
+#[inline(always)]
 const fn degrees_to_radians(degrees: f32) -> f32 {
     degrees * f32::consts::PI / 180.0
 }

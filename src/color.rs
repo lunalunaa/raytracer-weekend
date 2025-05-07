@@ -20,6 +20,7 @@ impl Rgb {
 pub type Color = Vec3;
 
 impl Color {
+    #[inline(always)]
     pub fn linear_to_gamma(linear_component: f32) -> f32 {
         if linear_component > 0. {
             linear_component.sqrt()
@@ -28,6 +29,7 @@ impl Color {
         }
     }
 
+    #[inline(always)]
     pub fn as_rgb(&self) -> Rgb {
         let intensity = Interval::new(0.000, 0.999);
         let r = (256.0 * intensity.clamp(Self::linear_to_gamma(self.x))) as u8;
