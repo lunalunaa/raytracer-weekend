@@ -40,12 +40,12 @@ impl Material for Lambertian {
 
 pub struct Metal {
     pub albedo: Color,
-    pub fuzz: f64,
+    pub fuzz: f32,
 }
 
 impl Metal {
     #[inline]
-    pub const fn new(albedo: Color, fuzz: f64) -> Self {
+    pub const fn new(albedo: Color, fuzz: f32) -> Self {
         Self { albedo, fuzz }
     }
 }
@@ -68,15 +68,15 @@ impl Material for Metal {
 // refractive index in vacuum or air
 // or the ratio of the refractive index over the refractive index of the enclosing media
 pub struct Dielectric {
-    pub refract_idx: f64,
+    pub refract_idx: f32,
 }
 
 impl Dielectric {
-    pub fn new(refract_idx: f64) -> Self {
+    pub fn new(refract_idx: f32) -> Self {
         Self { refract_idx }
     }
 
-    fn reflectance(cosine: f64, refract_idx: f64) -> f64 {
+    fn reflectance(cosine: f32, refract_idx: f32) -> f32 {
         let mut r_0 = (1. - refract_idx) / (1. + refract_idx);
         r_0 *= r_0;
         r_0 + (1. - r_0) * (1. - cosine).powi(5)
@@ -102,12 +102,13 @@ impl Material for Dielectric {
 
         let cannot_refract = ri * sin_theta > 1.0;
 
-        let dir =
-            if cannot_refract || Self::reflectance(cos_theta, ri) > rand::random_range(0.0..1.0) {
-                r_in_unit_dir.reflect(rec.normal())
-            } else {
-                r_in_unit_dir.refract(rec.normal(), ri)
-            };
+        let dir = if cannot_refract
+            || Self::reflectance(cos_theta, ri) > fastrand_contrib::f32_range(0.0..1.0)
+        {
+            r_in_unit_dir.reflect(rec.normal())
+        } else {
+            r_in_unit_dir.refract(rec.normal(), ri)
+        };
 
         let r = Ray::new(rec.p, dir);
         Scatter::Scattered(r, atten)

@@ -1,4 +1,4 @@
-use std::{f64, fs::File, io::BufWriter, time::Instant};
+use std::{f32, fs::File, io::BufWriter, time::Instant};
 
 use crate::{
     color::Color,
@@ -12,22 +12,22 @@ use image::Rgb;
 
 #[allow(unused)]
 pub struct Camera {
-    pub aspect_ratio: f64,        // Ratio of image width over height
+    pub aspect_ratio: f32,        // Ratio of image width over height
     pub image_width: u32,         // Rendered image width in pixel count
     image_height: u32,            // Rendered image height
     pub samples_per_pixel: usize, // Count of random samples for each pixel
-    pixel_samples_scale: f64,     // Color scale factor for a sum of pixel samples
+    pixel_samples_scale: f32,     // Color scale factor for a sum of pixel samples
     centre: Point3,               // Camera center
     pixel00_loc: Point3,          // Location of pixel 0, 0
     pixel_delta_u: Vec3,          // Offset to pixel to the right
     pixel_delta_v: Vec3,          // Offset to pixel below
     max_bounce_depth: usize,      // Maximal number of bounces for a ray
-    pub vfov: f64,                // Vertial field of view
+    pub vfov: f32,                // Vertial field of view
     pub lookfrom: Point3,         // Point camera is looking from
     pub lookat: Point3,           // Point camera is looking at
     pub vup: Vec3,                // Camera-relative "up" direction
-    pub defocus_angle: f64,       // Variation angle of rays through each pixel
-    pub focus_dist: f64,          // Distance from camera lookfrom point to plane of perfect focus
+    pub defocus_angle: f32,       // Variation angle of rays through each pixel
+    pub focus_dist: f32,          // Distance from camera lookfrom point to plane of perfect focus
     // camera frame basis vecs
     u: Vec3,
     v: Vec3,
@@ -38,21 +38,21 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(
-        aspect_ratio: f64,
+        aspect_ratio: f32,
         image_width: u32,
         samples_per_pixel: usize,
         max_bounce_depth: usize,
-        vfov: f64,
+        vfov: f32,
         lookfrom: Point3,
         lookat: Point3,
         vup: Vec3,
-        defocus_angle: f64,
-        focus_dist: f64,
+        defocus_angle: f32,
+        focus_dist: f32,
     ) -> Self {
-        let mut image_height = (image_width as f64 / aspect_ratio) as u32;
+        let mut image_height = (image_width as f32 / aspect_ratio) as u32;
         image_height = if image_height < 1 { 1 } else { image_height };
 
-        let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
+        let pixel_samples_scale = 1.0 / samples_per_pixel as f32;
 
         let centre = lookfrom;
 
@@ -61,7 +61,7 @@ impl Camera {
         let theta = degrees_to_radians(vfov);
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h * focus_dist;
-        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
+        let viewport_width = viewport_height * (image_width as f32 / image_height as f32);
 
         // calculate the u,v,w unit basis vectors for the camera coordinate frame.
         let w = (lookfrom - lookat).unit_vec();
@@ -73,8 +73,8 @@ impl Camera {
         let viewport_v = viewport_height * (-v);
 
         // calculate pixel deltas
-        let pixel_delta_u = viewport_u / image_width as f64;
-        let pixel_delta_v = viewport_v / image_height as f64;
+        let pixel_delta_u = viewport_u / image_width as f32;
+        let pixel_delta_v = viewport_v / image_height as f32;
 
         // calculate upper left pixel coordinate
         let viewport_upper_left = centre - (focus_dist * w) - viewport_u / 2.0 - viewport_v / 2.0;
@@ -138,10 +138,10 @@ impl Camera {
 
     // return a pair within [-0.5, 0.5], [-0.5, 0.5] range
     #[inline]
-    fn sample_square() -> (f64, f64) {
+    fn sample_square() -> (f32, f32) {
         (
-            rand::random_range(-0.5..=0.5),
-            rand::random_range(-0.5..=0.5),
+            fastrand_contrib::f32_range(-0.5..=0.5),
+            fastrand_contrib::f32_range(-0.5..=0.5),
         )
     }
 
@@ -158,8 +158,8 @@ impl Camera {
 
         let offset = Self::sample_square();
         let pixel_sample = self.pixel00_loc
-            + ((i as f64 + offset.0) * self.pixel_delta_u)
-            + ((j as f64 + offset.1) * self.pixel_delta_v);
+            + ((i as f32 + offset.0) * self.pixel_delta_u)
+            + ((j as f32 + offset.1) * self.pixel_delta_v);
 
         let ray_origin = if self.defocus_angle <= 0. {
             self.centre
@@ -177,7 +177,7 @@ impl Camera {
             return Color::zero();
         }
 
-        if let Some(rec) = world.hit(r, &Interval::new(0.001, f64::INFINITY)) {
+        if let Some(rec) = world.hit(r, &Interval::new(0.001, f32::INFINITY)) {
             if let Scatter::Scattered(r, atten) = rec.mat.scatter(r, &rec) {
                 return atten * Self::ray_color(&r, world, bounce_depth - 1);
             } else {
@@ -194,6 +194,6 @@ impl Camera {
 }
 
 #[inline]
-const fn degrees_to_radians(degrees: f64) -> f64 {
-    degrees * f64::consts::PI / 180.0
+const fn degrees_to_radians(degrees: f32) -> f32 {
+    degrees * f32::consts::PI / 180.0
 }

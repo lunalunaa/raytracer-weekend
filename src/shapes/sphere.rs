@@ -9,13 +9,13 @@ use crate::{
 
 pub struct Sphere {
     pub centre: Point3,
-    pub radius: f64,
+    pub radius: f32,
     pub mat: Arc<dyn Material + Sync + Send>,
     pub bbox: Aabb,
 }
 
 impl Sphere {
-    pub fn new(centre: Point3, radius: f64, mat: Arc<dyn Material + Sync + Send>) -> Self {
+    pub fn new(centre: Point3, radius: f32, mat: Arc<dyn Material + Sync + Send>) -> Self {
         let radius = radius.max(0.);
         let rvec = Vec3::new(radius, radius, radius);
         let bbox = Aabb::new(&(centre - rvec), &(centre + rvec));

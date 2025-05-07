@@ -1,7 +1,5 @@
 use std::{cmp::Ordering, sync::Arc};
 
-use rand::random_range;
-
 use crate::{
     aabb::Aabb,
     material::Material,
@@ -20,7 +18,7 @@ impl Ray {
     }
 
     #[inline]
-    pub fn at(&self, t: f64) -> Point3 {
+    pub fn at(&self, t: f32) -> Point3 {
         self.origin + t * self.dir
     }
 }
@@ -56,7 +54,7 @@ impl FaceNormal {
 
 #[derive(Clone)]
 pub struct HitRecord {
-    pub t: f64,
+    pub t: f32,
     pub p: Point3,
     pub face_normal: FaceNormal,
     pub mat: Arc<dyn Material + Sync + Send>,
@@ -78,7 +76,7 @@ impl HitRecord {
     }
 
     pub fn new(
-        t: f64,
+        t: f32,
         p: Point3,
         face_normal: FaceNormal,
         mat: Arc<dyn Material + Sync + Send>,
@@ -248,39 +246,39 @@ impl Hittable for BVHNode {
 
 #[derive(Clone)]
 pub struct Interval {
-    pub min: f64,
-    pub max: f64,
+    pub min: f32,
+    pub max: f32,
 }
 
 #[allow(unused)]
 impl Interval {
     #[inline]
-    pub const fn new(min: f64, max: f64) -> Self {
+    pub const fn new(min: f32, max: f32) -> Self {
         Self { min, max }
     }
 
     #[inline]
-    pub const fn size(&self) -> f64 {
+    pub const fn size(&self) -> f32 {
         self.max - self.min
     }
 
     #[inline]
-    pub const fn contains(&self, x: f64) -> bool {
+    pub const fn contains(&self, x: f32) -> bool {
         self.min <= x && x <= self.max
     }
 
     #[inline]
-    pub const fn surrounds(&self, x: f64) -> bool {
+    pub const fn surrounds(&self, x: f32) -> bool {
         self.min < x && x < self.max
     }
 
     #[inline]
-    pub const fn clamp(&self, x: f64) -> f64 {
+    pub const fn clamp(&self, x: f32) -> f32 {
         x.clamp(self.min, self.max)
     }
 
     #[inline]
-    pub const fn expand(&self, delta: f64) -> Self {
+    pub const fn expand(&self, delta: f32) -> Self {
         let padding = delta / 2.;
         Self::new(self.min - padding, self.max + padding)
     }
@@ -294,6 +292,6 @@ impl Interval {
         Self::new(min, max)
     }
 
-    pub const EMPTY: Interval = Interval::new(f64::INFINITY, f64::NEG_INFINITY);
-    pub const UNIVERSE: Interval = Interval::new(f64::NEG_INFINITY, f64::INFINITY);
+    pub const EMPTY: Interval = Interval::new(f32::INFINITY, f32::NEG_INFINITY);
+    pub const UNIVERSE: Interval = Interval::new(f32::NEG_INFINITY, f32::INFINITY);
 }

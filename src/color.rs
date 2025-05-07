@@ -20,7 +20,7 @@ impl Rgb {
 pub type Color = Vec3;
 
 impl Color {
-    pub fn linear_to_gamma(linear_component: f64) -> f64 {
+    pub fn linear_to_gamma(linear_component: f32) -> f32 {
         if linear_component > 0. {
             linear_component.sqrt()
         } else {

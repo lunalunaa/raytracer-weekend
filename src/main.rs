@@ -31,11 +31,11 @@ fn main() -> Result<()> {
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat: f64 = rand::random_range(0.0..1.0);
+            let choose_mat: f32 = fastrand_contrib::f32_range(0.0..1.0);
             let centre = Point3::new(
-                a as f64 + 0.9 * rand::random_range(0.0..1.0),
+                a as f32 + 0.9 * fastrand_contrib::f32_range(0.0..1.0),
                 0.2,
-                b as f64 + 0.9 * rand::random_range(0.0..1.0),
+                b as f32 + 0.9 * fastrand_contrib::f32_range(0.0..1.0),
             );
 
             if (centre - Vec3::new(4.0, 0.2, 0.)).len() > 0.9 {
@@ -51,7 +51,7 @@ fn main() -> Result<()> {
                     // metal
 
                     let albedo = Color::random_range(0.5, 1.0);
-                    let fuzz = rand::random_range(0.0..0.5);
+                    let fuzz = fastrand_contrib::f32_range(0.0..0.5);
                     sphere_meterial = Arc::new(Metal::new(albedo, fuzz));
                     let sphere = Sphere::new(centre, 0.2, sphere_meterial);
                     world.add(Arc::new(sphere));
