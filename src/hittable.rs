@@ -90,6 +90,7 @@ impl Hittable for HittableList {
         rec
     }
 
+    #[inline(always)]
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
     }
