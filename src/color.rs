@@ -7,7 +7,6 @@ pub struct Rgb {
     pub b: u8,
 }
 
-#[allow(unused)]
 impl Rgb {
     pub fn new(r: u8, g: u8, b: u8) -> Self {
         Rgb { r, g, b }

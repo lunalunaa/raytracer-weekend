@@ -8,7 +8,6 @@ pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Scatter;
 }
 
-#[allow(unused)]
 pub enum Scatter {
     Scattered(Ray, Color), // scattered ray and attenuation
     Absorbed,

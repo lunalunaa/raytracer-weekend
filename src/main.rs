@@ -3,10 +3,11 @@ use std::sync::Arc;
 use camera::Camera;
 use color::Color;
 use material::{Dielectric, Lambertian, Material, Metal};
-use ray::HittableList;
+use ray::{BVHNode, HittableList};
 use shapes::sphere::Sphere;
 use vector::{Point3, Vec3};
 
+mod aabb;
 mod camera;
 mod color;
 mod material;
@@ -82,6 +83,10 @@ fn main() -> Result<()> {
         1.,
         material3,
     )));
+
+    let bvh_node = BVHNode::from_hittable_list(world);
+    let mut world = HittableList::new();
+    world.add(Arc::new(bvh_node));
 
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 1200;

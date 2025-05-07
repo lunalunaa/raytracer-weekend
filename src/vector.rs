@@ -9,7 +9,6 @@ pub struct Vec3 {
 
 pub type Point3 = Vec3;
 
-#[allow(unused)]
 impl Vec3 {
     #[inline]
     pub const fn zero() -> Self {
