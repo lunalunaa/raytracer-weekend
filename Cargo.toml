@@ -4,10 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+image = { version = "0.25.6", default-features = false, features = [
+    "png",
+    "rayon",
+] }
 anyhow = "1.0.98"
 fastrand = "2.3.0"
 fastrand-contrib = "0.1.0"
-image = "0.25.6"
 indicatif = "0.17.11"
 rayon = "1.10.0"
 
@@ -20,3 +23,5 @@ opt-level = 1
 [profile.release]
 codegen-units = 1
 lto = "fat"
+panic = "abort"
+strip = "symbols"
