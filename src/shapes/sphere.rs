@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use crate::{
     aabb::Aabb,
+    hittable::{HitRecord, Hittable},
     material::Material,
-    ray::{HitRecord, Hittable, Interval, Ray},
+    ray::{Interval, Ray},
     vector::{Point3, Vec3},
 };
 

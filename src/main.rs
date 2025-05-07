@@ -1,15 +1,18 @@
 use std::sync::Arc;
 
+use crate::hittable::HittableList;
+use bvh::BVHNode;
 use camera::Camera;
 use color::Color;
 use material::{Dielectric, Lambertian, Material, Metal};
-use ray::{BVHNode, HittableList};
 use shapes::sphere::Sphere;
 use vector::{Point3, Vec3};
 
 mod aabb;
+mod bvh;
 mod camera;
 mod color;
+mod hittable;
 mod material;
 mod ray;
 mod shapes;

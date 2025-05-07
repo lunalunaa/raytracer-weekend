@@ -1,9 +1,10 @@
 use std::{f32, fs::File, io::BufWriter, time::Instant};
 
+use crate::hittable::Hittable;
 use crate::{
     color::Color,
     material::Scatter,
-    ray::{Hittable, Interval, Ray},
+    ray::{Interval, Ray},
     vector::{Point3, Vec3},
 };
 
