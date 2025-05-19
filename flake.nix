@@ -1,51 +1,77 @@
 {
+  description = "Build a cargo project without extra checks";
+
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
-    naersk.url = "github:nix-community/naersk";
-    rust-overlay.url = "github:oxalica/rust-overlay";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    crane.url = "github:ipetkov/crane";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, flake-utils, naersk, nixpkgs, rust-overlay }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      crane,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
-        overlays = [ (import rust-overlay) ];
-        pkgs = (import nixpkgs) {
-          inherit system overlays;
+        pkgs = nixpkgs.legacyPackages.${system};
+
+        craneLib = crane.mkLib pkgs;
+
+        # Common arguments can be set here to avoid repeating them later
+        # Note: changes here will rebuild all dependency crates
+        commonArgs = {
+          src = craneLib.cleanCargoSource ./.;
+          strictDeps = true;
+
+          buildInputs =
+            [
+              # Add additional build inputs here
+            ]
+            ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+              # Additional darwin specific inputs can be set here
+              pkgs.libiconv
+            ];
         };
 
-        naersk' = pkgs.callPackage naersk { };
-        buildInputs = with pkgs; [
-        ];
-        nativeBuildInputs = with pkgs; [
-          # This sets up the rust suite, automatically selecting the latest nightly version
-          (rust-bin.selectLatestNightlyWith
-            (toolchain: toolchain.default.override {
-              extensions = [ "rust-src" "clippy" ];
-            }))
-        ];
+        raytracer-weekend = craneLib.buildPackage (
+          commonArgs
+          // {
+            cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+
+            # Additional environment variables or build phases/hooks can be set
+            # here *without* rebuilding all dependency crates
+            # MY_CUSTOM_VAR = "some value";
+          }
+        );
       in
-      rec {
-        # For `nix build` & `nix run`:
-        defaultPackage = packages.naersk-nightly;
-        packages = rec {
-          naersk-nightly = naersk'.buildPackage {
-            src = ./.;
-            nativeBuildInputs = nativeBuildInputs;
-            buildInputs = buildInputs;
-          };
+      {
+        checks = {
+          inherit raytracer-weekend;
         };
 
-        # For `nix develop`:
-        devShell = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
-            cargo-expand
-            nixpkgs-fmt
-            cmake
-          ] ++ buildInputs ++ nativeBuildInputs;
+        packages.default = raytracer-weekend;
+
+        apps.default = flake-utils.lib.mkApp {
+          drv = raytracer-weekend;
+        };
+
+        devShells.default = craneLib.devShell {
+          # Inherit inputs from checks.
+          checks = self.checks.${system};
+
+          # Additional dev-shell environment variables can be set directly
+          # MY_CUSTOM_DEVELOPMENT_VAR = "something else";
+
+          # Extra inputs can be added here; cargo and rustc are provided by default.
+          packages = [
+            # pkgs.ripgrep
+          ];
         };
       }
     );
 }
-
-
