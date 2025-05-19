@@ -2,4 +2,4 @@
 *.ppm
 *.png
 bench.md
-.direnv
+/.direnv
